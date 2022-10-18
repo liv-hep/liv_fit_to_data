@@ -37,6 +37,8 @@ def fit_to_data(coms=None):
     argparser.add_argument('--id_regex', required=True, type=str,
                            help='regex of root file name to find toy ID')
     argparser.add_argument('--h_name', default="h_generated", help='histogram name')
+    argparser.add_argument('--plot', type=int, default=None, help='sample ID for plot')
+    
     if coms:
         args = argparser.parse_args(coms)
     else:
@@ -98,17 +100,19 @@ def fit_to_data(coms=None):
             
             par = mu.getValV()
             err = mu.getError()
-            #plot and save
-            '''
-            RooPlot *frame = sday.frame(Title("Fit to data"));
-            sigData->plotOn(frame);
-            model->plotOn(frame);
-            frame->SetAxisRange(0.996, 1.004, "Y");
-            TCanvas *fitData = new TCanvas("fit");
-            fitData->cd();
-            frame->Draw();
-            fitData->SaveAs(("fit_results_"+coef+"_"+toy_ID+".root").c_str());
-            '''
+            
+            if  int(args.plot)==int(toy_ID):
+                
+                frame = sday.frame(Title=model_str);
+                sigData.plotOn(frame);
+                model.plotOn(frame);
+                frame.SetAxisRange(0.996, 1.004, "Y");
+                fitData = ROOT.TCanvas("fit");
+                fitData.cd();
+                frame.Draw();
+                fitData.SaveAs(("fit_results_"+model_str+"_"+toy_ID+".root"));
+                fitData.SaveAs(("fit_results_"+model_str+"_"+toy_ID+".pdf"));
+            
             #Save fit results.
             chi2 = model.createChi2(sigData, ROOT.RooFit.Range("fullRange"),
                                     ROOT.RooFit.DataError(ROOT.RooAbsData.SumW2)).getVal()

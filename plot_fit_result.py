@@ -51,12 +51,29 @@ def plot_sample(ax, pd_data, sample_ID, truth=False):
             plot_err(ax,x=par,y=i,xerr=err,yerr=None) #plot one and two sigma err
             
 
+def plot_each_sample(pd_data, sp_ids):
+    y_list = [i for i in range(len(parameters))]
+    fig, axes =  plt.subplots(1,1, sharey=True,figsize=(4,10))
+    for sp in sp_ids:
+        plot_sample(axes, pd_data, sp)
+        axes.set_title("Sample %i"%sp)
+        plt.setp(axes, yticks=y_list, yticklabels=parameters)
+        plt.yticks(y_list)
+        plt.xlabel("fitted value")
+        #plt.ylabel("coefficient $d_{i}$")
+        plt.xlim(-5e-5, 5e-5)
+        plt.xticks([i*1e-5 for i in range(-5,5,)])
+        plt.savefig(f"SigFit_summary_sample{sp}.pdf", bbox_inches='tight')
+        plt.cla()
+            
+
 
 import argparse
 
 parser = argparse.ArgumentParser(description='Results based on many samples')
 parser.add_argument('--input_file', type=str, help='name of input files produced from fit script')
-
+parser.add_argument('--sample_ids', default=0, nargs='+', type=int, help='Sample ID')
+parser.add_argument('--print', default=False, action='store_true', help='print fit values')
 args = parser.parse_args()
             
 null_spurious_results = args.input_file
@@ -72,61 +89,17 @@ Pars = spurious_tests[parameters]
 
 
 
-pd_stats = pd.DataFrame()
-pd_stats["sample ID"] = [0]
-fig, axes =  plt.subplots(1,1, sharey=True,figsize=(6,6))
-for d in parameters:
-    axes.hist(Pars[d].to_numpy(), bins=100, label=d)
-    plt.xlabel(f"coefficient {d}")
-    plt.ylabel("counts")
-    #plt.title("Null samples: spurious signal test")
-    plt.xlim(-1e-5, 1e-5)
-    plt.ylim(0, 40)
-    plt.text(3e-6, 35, f"mean: {Pars[d].mean():.3e}")
-    plt.text(3e-6, 30, f"std: {Pars[d].std():.3e}")
-    pd_stats[d] = Pars[d].mean()
-    pd_stats[f"{d}_err"] = Pars[d].std()
-    #plt.show()
-    plt.savefig(f"distribution_plots_{d}.pdf", bbox_inches='tight')
-    plt.cla()
+plot_each_sample(spurious_tests, sp_ids=args.sample_ids)
 
 
-
-chi2_p0 = spurious_tests[[f"{i}_chi2_p0" for i in parameters]]
-fig, axes =  plt.subplots(1,1, sharey=True,figsize=(6,6))
-for d in parameters:
-    axes.hist(chi2_p0[f"{d}_chi2_p0"].to_numpy(), bins=100, label=d)
-    plt.xlabel(f"chi2_p0: {d}")
-    plt.ylabel("counts")
-    #plt.title("Null samples: spurious signal test")
-    #plt.xlim(-1e-5, 1e-5)
-    plt.ylim(0, 40)
-    #plt.text(3e-6, 35, f"mean: {chi2_p0[f'{d}_chi2_p0'].mean():.3e}")
-    #plt.text(3e-6, 30, f"std: {chi2_p0[f'{d}_chi2_p0'].std():.3e}")
-    #plt.show()
-    plt.savefig(f"Stats_chi2_p0_test_{d}.pdf", bbox_inches='tight')
-    plt.cla()
-
-
-
-sample_id=0
-fig, axes =  plt.subplots(1,1, sharey=True,figsize=(4,10))
-plot_sample(axes, pd_stats, sample_id)
-#plot_sample(axes, df_truth, sp, truth=True)
-#axes.set_title("Null 1K samples: summary ")
-plt.setp(axes, yticks=[i for i in range(len(parameters))], yticklabels=parameters)
-plt.yticks([i for i in range(len(parameters))])
-plt.xlabel("average value")
-#plt.ylabel("coefficient $d_{i}$")
-plt.xlim(-5e-5, 5e-5)
-plt.xticks([-5e-5,-4e-5,-3e-5,-2e-5,-1e-5,0, 1e-5, 2e-5, 3e-5, 4e-5, 5e-5])
-plt.savefig(f"SigFit_summary_AllSamples.pdf", bbox_inches='tight')
-
-
-#print starts
-print("                value           err    ")
-for p in parameters[::-1]:
-    print(f"{p:12}: ", f"{pd_stats[p].loc[0]: 1.4E} +/-", f"{pd_stats[p+'_err'].loc[0]:1.4E}")
+if args.print:
+    for i in args.sample_ids:
+        _sample = spurious_tests[spurious_tests["sample ID"]==i]
+        #print starts
+        print(f"Sample {i}:            value           err    ")
+        for p in parameters[::-1]:
+            print(f"{p:12}: ", f"{_sample[p].values[0]: 1.4E} +/-", f"{_sample[p+'_err'].values[0]:1.4E}")
+        print('\n')
 
 
 
