@@ -93,15 +93,15 @@ def fit_to_data(coms=None):
             mu = ROOT.RooRealVar("mu", "mu", 0, -0.2, 0.2);
             model = ROOT.RooGenericPdf("sig", get_model_str(model_str),[sday, mu])
             
-            model.chi2FitTo(sigData,
-                        ROOT.RooFit.RecoverFromUndefinedRegions(1.),
-                        ROOT.RooFit.IntegrateBins(0.)
-                      )
+            model.chi2FitTo(sigData)
+                        #ROOT.RooFit.RecoverFromUndefinedRegions(1.)
+                        #ROOT.RooFit.IntegrateBins(0.)
+                      
             
             par = mu.getValV()
             err = mu.getError()
             
-            if  int(args.plot)==int(toy_ID):
+            if  args.plot==int(toy_ID):
                 
                 frame = sday.frame(Title=model_str);
                 sigData.plotOn(frame);
@@ -110,9 +110,21 @@ def fit_to_data(coms=None):
                 fitData = ROOT.TCanvas("fit");
                 fitData.cd();
                 frame.Draw();
-                fitData.SaveAs(("fit_results_"+model_str+"_"+toy_ID+".root"));
-                fitData.SaveAs(("fit_results_"+model_str+"_"+toy_ID+".pdf"));
-            
+                fitData.SaveAs(("fit_results_"+model_str+"_"+toy_ID+".root"))
+                fitData.SaveAs(("fit_results_"+model_str+"_"+toy_ID+".pdf"))
+                
+                #create profile of mu
+                print("Sday: ", sday.getValV())
+                can_mu = ROOT.TCanvas("mu")
+                can_mu.cd()
+                frame1 = mu.frame(Bins=1000, Range=(-0.0002, 0.0002), Title=" profile scan")
+                chi2_pdf= model.createChi2(sigData,
+                                    ROOT.RooFit.DataError(ROOT.RooAbsData.SumW2))
+                #chi2_pdf.plotOn(frame1, LineColor="r")
+                profile_mu = chi2_pdf.createProfile({mu})
+                profile_mu.plotOn(frame1, LineColor="r")
+                frame1.Draw()
+                can_mu.SaveAs(("profile_chi2PDF_"+model_str+"_"+toy_ID+".pdf"))
             #Save fit results.
             chi2 = model.createChi2(sigData, ROOT.RooFit.Range("fullRange"),
                                     ROOT.RooFit.DataError(ROOT.RooAbsData.SumW2)).getVal()

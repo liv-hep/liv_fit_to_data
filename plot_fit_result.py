@@ -3,7 +3,12 @@
 
 
 import pandas as pd
-pd.options.display.float_format = '{:,.5e}'.format
+#pd.options.display.float_format = '{:,.5e}'.format
+
+from matplotlib import ticker
+formatter = ticker.ScalarFormatter(useMathText=True)
+formatter.set_scientific(True)
+formatter.set_powerlimits((-1,1))
 
 import matplotlib.pyplot as plt
 params = {'legend.fontsize': 'x-large',
@@ -45,25 +50,37 @@ def plot_sample(ax, pd_data, sample_ID, truth=False):
             plot_err(ax,x=par,y=i,xerr=None,yerr=None, color='red')
     else:
             
-        for i, d in enumerate(pars):
+        for i, d in enumerate(pars[:-4]):
             par = sample[d].values[0]
             err = sample["%s_err"%d].values[0]
-            plot_err(ax,x=par,y=i,xerr=err,yerr=None) #plot one and two sigma err
+            plot_err(ax[1],x=par,y=i,xerr=err,yerr=None) #plot one and two sigma err
             
+        for i, d in enumerate(pars[-4:]):
+            par = sample[d].values[0]
+            err = sample["%s_err"%d].values[0]
+            plot_err(ax[0],x=par,y=i,xerr=err,yerr=None) #plot one and two sigma err
+ 
+
 
 def plot_each_sample(pd_data, sp_ids):
-    y_list = [i for i in range(len(parameters))]
-    fig, axes =  plt.subplots(1,1, sharey=True,figsize=(4,10))
+    fig, axes =  plt.subplots(2,1,figsize=(5,12), gridspec_kw={'height_ratios': [1,2]})
     for sp in sp_ids:
         plot_sample(axes, pd_data, sp)
-        axes.set_title("Sample %i"%sp)
-        plt.setp(axes, yticks=y_list, yticklabels=parameters)
-        plt.yticks(y_list)
-        plt.xlabel("fitted value")
-        #plt.ylabel("coefficient $d_{i}$")
-        plt.xlim(-5e-5, 5e-5)
-        plt.xticks([i*1e-5 for i in range(-5,5,)])
+        axes[0].set_title("Sample %i"%sp)
+        axes[1].set_yticks(list(range(len(parameters)-4)), parameters[:-4])
+        axes[0].set_yticks(list(range(4)), parameters[-4:])
+        
+        axes[1].set_xlabel("fitted value")
+        
+        axes[1].xaxis.set_major_formatter(formatter)
+        axes[0].xaxis.set_major_formatter(formatter)
+        
+        axes[0].xaxis.set_major_locator(plt.MaxNLocator(6))
+        axes[1].xaxis.set_major_locator(plt.MaxNLocator(6))
+        
         plt.savefig(f"SigFit_summary_sample{sp}.pdf", bbox_inches='tight')
+        axes[0].cla()
+        axes[1].cla()
         plt.cla()
             
 
