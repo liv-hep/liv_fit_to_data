@@ -5,12 +5,13 @@
 
 import sys
 import ROOT
+ROOT.gROOT.SetBatch(True)
 import argparse
 import logging
 import re
 
 def get_model_str(coeff):
-    m_list = {
+    m_list = {"line":"(1+mu)/6.28319",
         "d[u,X,Z]" : "1+mu*(6.28069*cos(sday)-41.0569*sin(sday))",
         "d[u,Y,Z]" : "1+mu*(41.0569*cos(sday)+6.28069*sin(sday))",
         "d[u,X-Y,X-Y]" : "1+mu*(77.6067*cos(2*sday)+24.3128*sin(2*sday))",
@@ -45,7 +46,7 @@ def fit_to_data(coms=None):
         args = argparser.parse_args()
     
     #common
-    sday = ROOT.RooRealVar("sday", "sday", 0, 6.28313)
+    sday = ROOT.RooRealVar("sday", "sday", 0, 6.28319)
     
     #create output file
     target_file = open(args.output, 'w')
@@ -87,11 +88,15 @@ def fit_to_data(coms=None):
         #loop over models
         models = ["d[u,X,Z]", "d[u,Y,Z]", "d[u,X-Y,X-Y]", "d[u,X,Y]",
                  "c[u,X,Z]", "c[u,Y,Z]", "c[u,X-Y,X-Y]", "c[u,X,Y]",
-                 "c[d,X,Z]", "c[d,Y,Z]", "c[d,X-Y,X-Y]", "c[d,X,Y]"]
+                 "c[d,X,Z]", "c[d,Y,Z]", "c[d,X-Y,X-Y]", "c[d,X,Y]", "line"]
         for model_str in models:
             #parameter of interest
-            mu = ROOT.RooRealVar("mu", "mu", 0, -0.2, 0.2);
-            model = ROOT.RooGenericPdf("sig", get_model_str(model_str),[sday, mu])
+            if model_str == "line":
+                mu = ROOT.RooRealVar("mu", "mu", 0, -1.5, 1.5);
+                model = ROOT.RooGenericPdf("sig", get_model_str(model_str),[mu])
+            else:
+                mu = ROOT.RooRealVar("mu", "mu", 0, -0.5, 0.5);
+                model = ROOT.RooGenericPdf("sig", get_model_str(model_str),[sday, mu])
             
             model.chi2FitTo(sigData)
                         #ROOT.RooFit.RecoverFromUndefinedRegions(1.)
@@ -101,8 +106,20 @@ def fit_to_data(coms=None):
             par = mu.getValV()
             err = mu.getError()
             
+            
+            #Save fit results.
+            chi2 = model.createChi2(sigData, #ROOT.RooFit.Range("fullRange"),
+                                    ROOT.RooFit.DataError(ROOT.RooAbsData.SumW2)).getVal()
+            degree_freedom = int(sigData.numEntries() - 1)
+            chi2_p0 = ROOT.Math.chisquared_cdf_c(chi2, degree_freedom)
+            
+            #Store results to a text file 
+            target_file.write(str(par)+' ')
+            target_file.write(str(err)+' ')
+            target_file.write(str(chi2)+' ')
+            target_file.write(str(chi2_p0)+' ')
+            
             if  args.plot==int(toy_ID):
-                
                 frame = sday.frame(Title=model_str);
                 sigData.plotOn(frame);
                 model.plotOn(frame);
@@ -117,7 +134,7 @@ def fit_to_data(coms=None):
                 print("Sday: ", sday.getValV())
                 can_mu = ROOT.TCanvas("mu")
                 can_mu.cd()
-                frame1 = mu.frame(Bins=1000, Range=(-0.0002, 0.0002), Title=" profile scan")
+                frame1 = mu.frame(Bins=1000, Range=(par-err*3, par+err*3), Title=f"{model_str}")
                 chi2_pdf= model.createChi2(sigData,
                                     ROOT.RooFit.DataError(ROOT.RooAbsData.SumW2))
                 #chi2_pdf.plotOn(frame1, LineColor="r")
@@ -125,17 +142,8 @@ def fit_to_data(coms=None):
                 profile_mu.plotOn(frame1, LineColor="r")
                 frame1.Draw()
                 can_mu.SaveAs(("profile_chi2PDF_"+model_str+"_"+toy_ID+".pdf"))
-            #Save fit results.
-            chi2 = model.createChi2(sigData, ROOT.RooFit.Range("fullRange"),
-                                    ROOT.RooFit.DataError(ROOT.RooAbsData.SumW2)).getVal()
-            degree_freedom = int(sigData.numEntries() - 1)
-            chi2_p0 = ROOT.Math.chisquared_cdf_c(chi2, degree_freedom)
-            
-            #Store results to a text file 
-            target_file.write(str(par)+' ')
-            target_file.write(str(err)+' ')
-            target_file.write(str(chi2/degree_freedom)+' ')
-            target_file.write(str(chi2_p0)+' ')
+                #print(f"chi2_pdf: {chi2_pdf.getVal()}")
+                
         target_file.write('\n') # start new line
         
     target_file.close()

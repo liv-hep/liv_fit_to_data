@@ -5,6 +5,11 @@
 import pandas as pd
 pd.options.display.float_format = '{:,.5e}'.format
 
+from matplotlib import ticker
+formatter = ticker.ScalarFormatter(useMathText=True)
+formatter.set_scientific(True)
+formatter.set_powerlimits((-1,1))
+
 import matplotlib.pyplot as plt
 params = {'legend.fontsize': 'x-large',
          'axes.labelsize': 'x-large',
@@ -45,10 +50,15 @@ def plot_sample(ax, pd_data, sample_ID, truth=False):
             plot_err(ax,x=par,y=i,xerr=None,yerr=None, color='red')
     else:
             
-        for i, d in enumerate(pars):
+        for i, d in enumerate(pars[:-5]):
             par = sample[d].values[0]
             err = sample["%s_err"%d].values[0]
-            plot_err(ax,x=par,y=i,xerr=err,yerr=None) #plot one and two sigma err
+            plot_err(ax[1],x=par,y=i,xerr=err,yerr=None) #plot one and two sigma err
+            
+        for i, d in enumerate(pars[-5:]):
+            par = sample[d].values[0]
+            err = sample["%s_err"%d].values[0]
+            plot_err(ax[0],x=par,y=i,xerr=err,yerr=None) #plot one and two sigma err
             
 
 
@@ -64,7 +74,7 @@ null_spurious_results = args.input_file
 col_names = ["sample ID"]
 parameters = ["d[u,X,Z]", "d[u,Y,Z]", "d[u,X-Y,X-Y]", "d[u,X,Y]",
               "c[u,X,Z]", "c[u,Y,Z]", "c[u,X-Y,X-Y]", "c[u,X,Y]",
-              "c[d,X,Z]", "c[d,Y,Z]", "c[d,X-Y,X-Y]", "c[d,X,Y]"]
+              "c[d,X,Z]", "c[d,Y,Z]", "c[d,X-Y,X-Y]", "c[d,X,Y]", "line"]
 for d in parameters:
     col_names += [d, f"{d}_err", f"{d}_chi2_ndf", f"{d}_chi2_p0"]
 spurious_tests = pd.read_csv(null_spurious_results, sep=' ',index_col=False, names=col_names)
@@ -110,16 +120,19 @@ for d in parameters:
 
 
 sample_id=0
-fig, axes =  plt.subplots(1,1, sharey=True,figsize=(4,10))
+fig, axes =  plt.subplots(2,1,figsize=(5,12), gridspec_kw={'height_ratios': [1,2]})
 plot_sample(axes, pd_stats, sample_id)
-#plot_sample(axes, df_truth, sp, truth=True)
-#axes.set_title("Null 1K samples: summary ")
-plt.setp(axes, yticks=[i for i in range(len(parameters))], yticklabels=parameters)
-plt.yticks([i for i in range(len(parameters))])
-plt.xlabel("average value")
-#plt.ylabel("coefficient $d_{i}$")
-plt.xlim(-5e-5, 5e-5)
-plt.xticks([-5e-5,-4e-5,-3e-5,-2e-5,-1e-5,0, 1e-5, 2e-5, 3e-5, 4e-5, 5e-5])
+#axes[0].set_title("Sample %i"%sp)
+axes[1].set_yticks(list(range(len(parameters)-5)), parameters[:-5])
+axes[0].set_yticks(list(range(5)), parameters[-5:])
+        
+axes[1].set_xlabel("Average fitted value")
+        
+axes[1].xaxis.set_major_formatter(formatter)
+axes[0].xaxis.set_major_formatter(formatter)
+        
+axes[0].xaxis.set_major_locator(plt.MaxNLocator(6))
+axes[1].xaxis.set_major_locator(plt.MaxNLocator(6))
 plt.savefig(f"SigFit_summary_AllSamples.pdf", bbox_inches='tight')
 
 

@@ -50,12 +50,12 @@ def plot_sample(ax, pd_data, sample_ID, truth=False):
             plot_err(ax,x=par,y=i,xerr=None,yerr=None, color='red')
     else:
             
-        for i, d in enumerate(pars[:-4]):
+        for i, d in enumerate(pars[:-5]):
             par = sample[d].values[0]
             err = sample["%s_err"%d].values[0]
             plot_err(ax[1],x=par,y=i,xerr=err,yerr=None) #plot one and two sigma err
             
-        for i, d in enumerate(pars[-4:]):
+        for i, d in enumerate(pars[-5:]):
             par = sample[d].values[0]
             err = sample["%s_err"%d].values[0]
             plot_err(ax[0],x=par,y=i,xerr=err,yerr=None) #plot one and two sigma err
@@ -67,8 +67,8 @@ def plot_each_sample(pd_data, sp_ids):
     for sp in sp_ids:
         plot_sample(axes, pd_data, sp)
         axes[0].set_title("Sample %i"%sp)
-        axes[1].set_yticks(list(range(len(parameters)-4)), parameters[:-4])
-        axes[0].set_yticks(list(range(4)), parameters[-4:])
+        axes[1].set_yticks(list(range(len(parameters)-5)), parameters[:-5])
+        axes[0].set_yticks(list(range(5)), parameters[-5:])
         
         axes[1].set_xlabel("fitted value")
         
@@ -98,7 +98,7 @@ null_spurious_results = args.input_file
 col_names = ["sample ID"]
 parameters = ["d[u,X,Z]", "d[u,Y,Z]", "d[u,X-Y,X-Y]", "d[u,X,Y]",
               "c[u,X,Z]", "c[u,Y,Z]", "c[u,X-Y,X-Y]", "c[u,X,Y]",
-              "c[d,X,Z]", "c[d,Y,Z]", "c[d,X-Y,X-Y]", "c[d,X,Y]"]
+              "c[d,X,Z]", "c[d,Y,Z]", "c[d,X-Y,X-Y]", "c[d,X,Y]", "line"]
 for d in parameters:
     col_names += [d, f"{d}_err", f"{d}_chi2_ndf", f"{d}_chi2_p0"]
 spurious_tests = pd.read_csv(null_spurious_results, sep=' ',index_col=False, names=col_names)
