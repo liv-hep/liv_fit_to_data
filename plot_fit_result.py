@@ -18,6 +18,28 @@ params = {'legend.fontsize': 'x-large',
          'ytick.labelsize':20}
 plt.rcParams.update(params)
 
+import mplhep as hep
+#hep.style.use(hep.style.ROOT) # For now ROOT defaults to CMS
+# Or choose one of the experiment styles
+#hep.style.use(hep.style.ATLAS)
+plt.style.use(hep.style.ATLAS)
+
+
+coef_latex = {
+        "d[u,X,Z]" : r"$d_{\it u}^{\it X,Z}$",
+        "d[u,Y,Z]" : r"$d_{\it u}^{\it Y,Z}$",
+        "d[u,X-Y,X-Y]" : r"$d_{\it u}^{\it X-Y,X-Y}$",
+        "d[u,X,Y]" :  r"$d_{\it u}^{\it X,Y}$",
+        "c[u,X,Z]" : r"$c_{\it u}^{\it X,Z}$",
+        "c[u,Y,Z]" : r"$c_{\it u}^{\it Y,Z}$",
+        "c[u,X-Y,X-Y]" : r"$c_{\it u}^{\it X-Y,X-Y}$",
+        "c[u,X,Y]" : r"$c_{\it u}^{\it X,Y}$",
+        "c[d,X,Z]" : r"$c_{\it d}^{\it X,Z}$",
+        "c[d,Y,Z]" : r"$c_{\it d}^{\it Y,Z}$",
+        "c[d,X-Y,X-Y]" : r"$c_{\it d}^{\it X-Y,X-Y}$",
+        "c[d,X,Y]" : r"$c_{\it d}^{\it X,Y}$"
+    }
+
 def plot_err(ax,x,y,xerr=None,yerr=None, color='black'):
     #2 sigma
     xerr_2 = None if xerr is None else  2*xerr
@@ -66,18 +88,20 @@ def plot_each_sample(pd_data, sp_ids):
     fig, axes =  plt.subplots(2,1,figsize=(5,12), gridspec_kw={'height_ratios': [1,2]})
     for sp in sp_ids:
         plot_sample(axes, pd_data, sp)
-        axes[0].set_title("Sample %i"%sp)
-        axes[1].set_yticks(list(range(len(parameters)-4)), parameters[:-4])
-        axes[0].set_yticks(list(range(4)), parameters[-4:])
+        #axes[0].set_title("Sample %i"%sp)
+        axes[1].set_yticks(list(range(len(parameters)-4)), labels_latex[:-4])
+        axes[0].set_yticks(list(range(4)), labels_latex[-4:])
         
-        axes[1].set_xlabel("fitted value")
+        #axes[1].set_xlabel("fitted value")
+        axes[1].set_xlabel("Sample %i"%sp, loc='center')
         
         axes[1].xaxis.set_major_formatter(formatter)
         axes[0].xaxis.set_major_formatter(formatter)
         
         axes[0].xaxis.set_major_locator(plt.MaxNLocator(6))
         axes[1].xaxis.set_major_locator(plt.MaxNLocator(6))
-        
+        hep.atlas.text(text="Internal", loc=0, ax=axes[0])
+        hep.atlas.label(data=True, loc=0,lumi=139, com=13, ax=axes[0])
         plt.savefig(f"SigFit_summary_sample{sp}.pdf", bbox_inches='tight')
         axes[0].cla()
         axes[1].cla()
@@ -99,13 +123,14 @@ col_names = ["sample ID"]
 parameters = ["d[u,X,Z]", "d[u,Y,Z]", "d[u,X-Y,X-Y]", "d[u,X,Y]",
               "c[u,X,Z]", "c[u,Y,Z]", "c[u,X-Y,X-Y]", "c[u,X,Y]",
               "c[d,X,Z]", "c[d,Y,Z]", "c[d,X-Y,X-Y]", "c[d,X,Y]"]
+
 for d in parameters:
     col_names += [d, f"{d}_err", f"{d}_chi2_ndf", f"{d}_chi2_p0"]
 spurious_tests = pd.read_csv(null_spurious_results, sep=' ',index_col=False, names=col_names)
 Pars = spurious_tests[parameters]
 
 
-
+labels_latex = [coef_latex[l] for l in parameters ]
 plot_each_sample(spurious_tests, sp_ids=args.sample_ids)
 
 

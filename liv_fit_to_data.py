@@ -10,6 +10,21 @@ import argparse
 import logging
 import re
 
+coef_latex = {
+        "d[u,X,Z]" : r"$d_{\it u}^{\it X,Z}$",
+        "d[u,Y,Z]" : r"$d_{\it u}^{\it Y,Z}$",
+        "d[u,X-Y,X-Y]" : r"$d_{\it u}^{\it X-Y,X-Y}$",
+        "d[u,X,Y]" :  r"$d_{\it u}^{\it X,Y}$",
+        "c[u,X,Z]" : r"$c_{\it u}^{\it X,Z}$",
+        "c[u,Y,Z]" : r"$c_{\it u}^{\it Y,Z}$",
+        "c[u,X-Y,X-Y]" : r"$c_{\it u}^{\it X-Y,X-Y}$",
+        "c[u,X,Y]" : r"$c_{\it u}^{\it X,Y}$",
+        "c[d,X,Z]" : r"$c_{\it d}^{\it X,Z}$",
+        "c[d,Y,Z]" : r"$c_{\it d}^{\it Y,Z}$",
+        "c[d,X-Y,X-Y]" : r"$c_{\it d}^{\it X-Y,X-Y}$",
+        "c[d,X,Y]" : r"$c_{\it d}^{\it X,Y}$"
+    }
+
 def get_model_str(coeff):
     m_list = {"line":"(1+mu)/6.28319",
         "d[u,X,Z]" : "1+mu*(6.28069*cos(sday)-41.0569*sin(sday))",
@@ -25,6 +40,8 @@ def get_model_str(coeff):
         "c[d,X-Y,X-Y]" : "1+mu*(2.24331*cos(2*sday)+0.702788*sin(2*sday))",
         "c[d,X,Y]" : "1+mu*(-1.40558*cos(2*sday)+4.48662*sin(2*sday))"
     }
+
+
     
     return m_list[coeff]
 
