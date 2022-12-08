@@ -28,15 +28,15 @@ plt.style.use(hep.style.ATLAS)
 coef_latex = {
         "d[u,X,Z]" : r"$d_{\it u}^{\it X,Z}$",
         "d[u,Y,Z]" : r"$d_{\it u}^{\it Y,Z}$",
-        "d[u,X-Y,X-Y]" : r"$d_{\it u}^{\it X-Y,X-Y}$",
+        "d[u,X-Y,X-Y]" : r"$d_{\it u}^{\it XX-YY}$",
         "d[u,X,Y]" :  r"$d_{\it u}^{\it X,Y}$",
         "c[u,X,Z]" : r"$c_{\it u}^{\it X,Z}$",
         "c[u,Y,Z]" : r"$c_{\it u}^{\it Y,Z}$",
-        "c[u,X-Y,X-Y]" : r"$c_{\it u}^{\it X-Y,X-Y}$",
+        "c[u,X-Y,X-Y]" : r"$c_{\it u}^{\it XX-YY}$",
         "c[u,X,Y]" : r"$c_{\it u}^{\it X,Y}$",
         "c[d,X,Z]" : r"$c_{\it d}^{\it X,Z}$",
         "c[d,Y,Z]" : r"$c_{\it d}^{\it Y,Z}$",
-        "c[d,X-Y,X-Y]" : r"$c_{\it d}^{\it X-Y,X-Y}$",
+        "c[d,X-Y,X-Y]" : r"$c_{\it d}^{\it XX-YY}$",
         "c[d,X,Y]" : r"$c_{\it d}^{\it X,Y}$"
     }
 

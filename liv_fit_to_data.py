@@ -53,7 +53,7 @@ def fit_to_data(coms=None):
                            type=str, help='output file name')
     
     argparser.add_argument('--id_regex', required=True, type=str,
-                           help='regex of root file name to find toy ID')
+                           help='regex <_seed(.+?).root> of root file name to find toy ID,')
     argparser.add_argument('--h_name', default="h_generated", help='histogram name')
     argparser.add_argument('--plot', type=int, default=None, help='sample ID for plot')
     
@@ -63,7 +63,7 @@ def fit_to_data(coms=None):
         args = argparser.parse_args()
     
     #common
-    sday = ROOT.RooRealVar("sday", "sday", 0, 6.28319)
+    sday = ROOT.RooRealVar("sday", "#omega T", 0, 6.28319)
     
     #create output file
     target_file = open(args.output, 'w')
