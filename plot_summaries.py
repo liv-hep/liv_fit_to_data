@@ -9,7 +9,7 @@ import numpy as np
 from matplotlib import ticker
 formatter = ticker.ScalarFormatter(useMathText=True)
 formatter.set_scientific(True)
-formatter.set_powerlimits((0,1))
+formatter.set_powerlimits((-1,1))
 
 import matplotlib.pyplot as plt
 params = {'legend.fontsize': 'x-large',
@@ -120,7 +120,7 @@ for d in parameters:
     pd_stats[d] = Pars[d].mean()
     pd_stats[f"{d}_err"] = Pars[d].std()
     #plt.show()
-    plt.savefig(f"distribution_plots_{d}.pdf", bbox_inches='tight')
+    plt.savefig(f"plots/distribution_plots_{d}.pdf", bbox_inches='tight')
     plt.cla()
 
 #plot Err distributions
@@ -143,7 +143,7 @@ for d in parameters:
     #pd_stats[d] = Pars[d].mean()
     #pd_stats[f"{d}_err"] = Pars[d].std()
     #plt.show()
-    plt.savefig(f"distribution_plots_{d}_errs.pdf", bbox_inches='tight')
+    plt.savefig(f"plots/distribution_plots_{d}_errs.pdf", bbox_inches='tight')
     plt.cla()
 
 
@@ -159,7 +159,7 @@ for d in parameters:
     #plt.text(3e-6, 35, f"mean: {chi2_p0[f'{d}_chi2_p0'].mean():.3e}")
     #plt.text(3e-6, 30, f"std: {chi2_p0[f'{d}_chi2_p0'].std():.3e}")
     #plt.show()
-    plt.savefig(f"Stats_chi2_p0_test_{d}.pdf", bbox_inches='tight')
+    plt.savefig(f"plots/Stats_chi2_p0_test_{d}.pdf", bbox_inches='tight')
     plt.cla()
 
 chi2 = spurious_tests[[f"{i}_chi2" for i in parameters]]
@@ -174,7 +174,7 @@ for d in parameters:
     #plt.text(3e-6, 35, f"mean: {chi2_p0[f'{d}_chi2_p0'].mean():.3e}")
     #plt.text(3e-6, 30, f"std: {chi2_p0[f'{d}_chi2_p0'].std():.3e}")
     #plt.show()
-    plt.savefig(f"Stats_chi2_test_{d}.pdf", bbox_inches='tight')
+    plt.savefig(f"plots/Stats_chi2_test_{d}.pdf", bbox_inches='tight')
     plt.cla()
 
 
@@ -187,7 +187,7 @@ labels_latex = [coef_latex[l] for l in parameters ]
 axes[1].set_yticks(list(range(len(parameters)-4)), labels_latex[:-4])
 axes[0].set_yticks(list(range(4)), labels_latex[-4:])
         
-axes[1].set_xlabel("Average fitted value")
+axes[1].set_xlabel(r"$\mu$", loc='center')
         
 axes[1].xaxis.set_major_formatter(formatter)
 axes[0].xaxis.set_major_formatter(formatter)
@@ -198,7 +198,7 @@ axes[1].xaxis.set_major_locator(plt.MaxNLocator(6))
 hep.atlas.text(text="Internal", loc=0, ax=axes[0])
 hep.atlas.label(data=True, loc=0,lumi=139, com=13, ax=axes[0])
 
-plt.savefig(f"SigFit_summary_AllSamples.pdf", bbox_inches='tight')
+plt.savefig(f"plots/SigFit_summary_AllSamples.pdf", bbox_inches='tight')
 
 
 #print starts

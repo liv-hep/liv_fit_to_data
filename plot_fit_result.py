@@ -102,7 +102,7 @@ def plot_each_sample(pd_data, sp_ids):
         axes[1].xaxis.set_major_locator(plt.MaxNLocator(6))
         hep.atlas.text(text="Internal", loc=0, ax=axes[0])
         hep.atlas.label(data=True, loc=0,lumi=139, com=13, ax=axes[0])
-        plt.savefig(f"SigFit_summary_sample{sp}.pdf", bbox_inches='tight')
+        plt.savefig(f"plots/SigFit_summary_sample{sp}.pdf", bbox_inches='tight')
         axes[0].cla()
         axes[1].cla()
         plt.cla()
