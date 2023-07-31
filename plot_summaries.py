@@ -88,6 +88,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description='Results based on many samples')
 parser.add_argument('--input_file', type=str, help='name of input files produced from fit script')
+parser.add_argument('--lumi', default=None, help='ATLAS luminosity XXX in fb^-1 unit')
 
 args = parser.parse_args()
             
@@ -196,7 +197,7 @@ axes[0].xaxis.set_major_locator(plt.MaxNLocator(6))
 axes[1].xaxis.set_major_locator(plt.MaxNLocator(6))
 
 hep.atlas.text(text="Internal", loc=0, ax=axes[0])
-hep.atlas.label(data=True, loc=0,lumi=139, com=13, ax=axes[0])
+hep.atlas.label(data=True, loc=0,lumi=args.lumi, com=13, ax=axes[0])
 
 plt.savefig(f"plots/SigFit_summary_AllSamples.pdf", bbox_inches='tight')
 

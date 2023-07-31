@@ -174,7 +174,8 @@ def fit_to_data(coms=None):
                     Upad.add_margins(left=0.15)
                     # Add the ATLAS Label
                     aplt.atlas_label(text="Internal", loc="upper left")
-                    Upad.text(0.2, 0.84, "#sqrt{s} = 13 TeV, 139 fb^{-1}", size=22, align=13)
+                    #Upad.text(0.2, 0.84, "#sqrt{s} = 13 TeV, 139 fb^{-1}", size=22, align=13)
+                    Upad.text(0.2, 0.84, "#sqrt{s} = 13 TeV", size=22, align=13)
                     # Add extra space at top of plot to make room for labels
                     Upad.add_margins(top=0.15)
                     
@@ -216,8 +217,8 @@ def fit_to_data(coms=None):
                 frame.Draw()
                 # Add the ATLAS Label
                 aplt.atlas_label(text="Internal", loc="upper left")
-                fitData.text(0.2, 0.84, "#sqrt{s} = 13 TeV, 139 fb^{-1}", size=22, align=13)
-                
+                #fitData.text(0.2, 0.84, "#sqrt{s} = 13 TeV, 139 fb^{-1}", size=22, align=13)
+                fitData.text(0.2, 0.84, "#sqrt{s} = 13 TeV", size=22, align=13)
                 fitDataFig.savefig(("plots/fit_results_"+model_str+"_"+toy_ID+"_12func.pdf"))
                 
                 #create profile of mu
@@ -235,8 +236,8 @@ def fit_to_data(coms=None):
                 #Scan.add_margins(top=0.15)
                 # Add the ATLAS Label
                 aplt.atlas_label(text="Internal", loc="upper left")
-                Scan.text(0.2, 0.84, "#sqrt{s} = 13 TeV, 139 fb^{-1}", size=22, align=13)
-                    
+                #Scan.text(0.2, 0.84, "#sqrt{s} = 13 TeV, 139 fb^{-1}", size=22, align=13)
+                Scan.text(0.2, 0.84, "#sqrt{s} = 13 TeV", size=22, align=13)
                 Scanfig.savefig(("plots/profile_chi2PDF_"+model_str+"_"+toy_ID+"_12func.pdf"))
                 #print(f"chi2_pdf: {chi2_pdf.getVal()}")
                 
